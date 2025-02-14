@@ -25,4 +25,4 @@ export default async function productList(selector, category) {
   document.querySelector(".title").innerHTML = category;
 }
 
-// hello1111111
+// hello11221
