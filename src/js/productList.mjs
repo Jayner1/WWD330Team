@@ -3,33 +3,22 @@ import { renderListWithTemplate } from "./utils.mjs";
 
 function productCardTemplate(product) {
   return `<li class="product-card">
-    <a href="product_pages/index.html?product=${product.Id}">
-      <img
-        src="${product.PrimaryMedium}"
-        alt="Image of ${product.Name}"
-      />
-      <h3 class="card__brand">${product.Brand.Name}</h3>
-      <h2 class="card__name">${product.NameWithoutBrand}</h2>
-      <p class="product-card__price">$${product.FinalPrice}</p>
-    </a>
+    <a href="/product_pages/index.html?product=${product.Id}">
+    <img
+      src="${product.Images.PrimaryMedium}"
+      alt="Image of ${product.Name}"
+    />
+    <h3 class="card__brand">${product.Brand.Name}</h3>
+    <h2 class="card__name">${product.NameWithoutBrand}</h2>
+    <p class="product-card__price">$${product.FinalPrice}</p></a>
   </li>`;
 }
 
 export default async function productList(selector, category) {
-  // get the element we will insert the list into from the selector
   const el = document.querySelector(selector);
-  // get the list of products
   const products = await getData(category);
-  
-  // Update the title dynamically
-  const categoryTitle = category ? category.charAt(0).toUpperCase() + category.slice(1) : "Products";
-  document.querySelector(".products h2").innerText = `Top Products: ${categoryTitle}`;
-
-  console.log(products); // Debugging to check fetched products
-
-  // render out the product list to the element
+  console.log(products);
   renderListWithTemplate(productCardTemplate, el, products);
+  document.querySelector(".title").innerHTML = category;
 }
 
-
-// hello311221
