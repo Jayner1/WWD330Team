@@ -20,10 +20,16 @@ export default async function productList(selector, category) {
   const el = document.querySelector(selector);
   // get the list of products
   const products = await getData(category);
-  console.log(products);
+  
+  // Update the title dynamically
+  const categoryTitle = category ? category.charAt(0).toUpperCase() + category.slice(1) : "Products";
+  document.querySelector(".products h2").innerText = `Top Products: ${categoryTitle}`;
+
+  console.log(products); // Debugging to check fetched products
+
   // render out the product list to the element
   renderListWithTemplate(productCardTemplate, el, products);
-  document.querySelector(".title").innerHTML = category;
 }
+
 
 // hello311221
