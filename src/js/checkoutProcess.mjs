@@ -1,4 +1,9 @@
-import { getLocalStorage } from "./utils.mjs";
+import {
+  setLocalStorage,
+  getLocalStorage,
+  alertMessage,
+  removeAllAlerts,
+} from "./utils.mjs";
 import { checkout } from "./externalServices.mjs";
 
 function formDataToJSON(formElement) {
@@ -47,16 +52,17 @@ const checkoutProcess = {
       this.outputSelector + " #num-items"
     );
     itemNumElement.innerText = this.list.length;
+
     const amounts = this.list.map((item) => item.FinalPrice);
-    this.itemTotal = amounts.reduce((sum, item) => sum + item);
-    summaryElement.innerText = "$" + this.itemTotal;
+    this.itemTotal = amounts.reduce((sum, item) => sum + item, 0);
+    summaryElement.innerText = this.formatCurrency(this.itemTotal);
   },
   calculateOrdertotal: function () {
     this.shipping = 10 + (this.list.length - 1) * 2;
     this.tax = (this.itemTotal * 0.06).toFixed(2);
     this.orderTotal = (
-      parseFloat(this.itemTotal) +
-      parseFloat(this.shipping) +
+      this.itemTotal +
+      this.shipping +
       parseFloat(this.tax)
     ).toFixed(2);
     this.displayOrderTotals();
@@ -67,9 +73,12 @@ const checkoutProcess = {
     const orderTotal = document.querySelector(
       this.outputSelector + " #orderTotal"
     );
-    shipping.innerText = "$" + this.shipping;
-    tax.innerText = "$" + this.tax;
-    orderTotal.innerText = "$" + this.orderTotal;
+    shipping.innerText = this.formatCurrency(this.shipping);
+    tax.innerText = this.formatCurrency(this.tax);
+    orderTotal.innerText = this.formatCurrency(this.orderTotal);
+  },
+  formatCurrency: function (amount) {
+    return "$" + parseFloat(amount).toFixed(2); 
   },
   checkout: async function (form) {
     const json = formDataToJSON(form);
@@ -82,7 +91,14 @@ const checkoutProcess = {
     try {
       const res = await checkout(json);
       console.log(res);
+      setLocalStorage("so-cart", []);
+      location.assign("/checkout/success.html");
     } catch (err) {
+      removeAllAlerts();
+      for (let message in err.message) {
+        alertMessage(err.message[message]);
+      }
+
       console.log(err);
     }
   },
